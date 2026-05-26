@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/course")
 public class CourseController {
 //    @Autowired
 //    public Course course;
 
-    @GetMapping("get-courses")
+    @GetMapping("/get-courses")
     public ResponseEntity<List<Course>> getCourses(){
         List<Course> courses=new ArrayList<>();
         courses.add(new Course("U23CC941","SLS",4));
@@ -24,7 +25,7 @@ public class CourseController {
         courses.add(new Course("U23CS791","C",3));
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
-    @GetMapping("{course-code}/{sub-Name}/{credits}")
+    @GetMapping("/{course-code}/{sub-Name}/{credits}")
     public ResponseEntity<Course>coursePathVariable(@PathVariable("course-code") String courseCode,
                                                     @PathVariable("sub-Name") String subjectName ,
                                                     @PathVariable("credits") int credits) {
@@ -32,26 +33,26 @@ public class CourseController {
         return ResponseEntity.ok(course);
 
     }
-    @GetMapping("query")
+    @GetMapping("/query")
     public ResponseEntity<Course> courseRequestVariable(@RequestParam String courseCode,
                                                           @RequestParam String subjectName,
                                                           @RequestParam int credits){
         Course course=new Course(courseCode,subjectName,credits);
         return ResponseEntity.ok(course);
     }
-    @PostMapping("create-course")
+    @PostMapping("/create-course")
     public ResponseEntity<Course> createCourse(@RequestBody Course course){
         System.out.println(course.getCourseCode());
         System.out.println(course.getSubjectName());
         System.out.println(course.getCredits());
         return ResponseEntity.ok(course);
     }
-    @PutMapping("{course-code}/update-course")
+    @PutMapping("/{course-code}/update-course")
     public ResponseEntity updateCourse(@PathVariable("course-code") String courseCode){
         return ResponseEntity.accepted().body("It doesnt have business logic");
     };
 
-    @DeleteMapping("{course-code}/delete-course")
+    @DeleteMapping("/{course-code}/delete-course")
     public ResponseEntity deleteCourse(@PathVariable("course-code") String courseCode){
         return ResponseEntity.accepted().body("Data removed or deleted successfully");
     }
