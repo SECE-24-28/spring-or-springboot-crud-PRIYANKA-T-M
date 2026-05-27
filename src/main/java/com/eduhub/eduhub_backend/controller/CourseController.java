@@ -45,14 +45,19 @@ public class CourseController {
     public ResponseEntity<Course> getCourse(
             @PathVariable("code") String courseCode){
         return courses.stream()
-                .filter((Course c) -> c.getCourseCode().equalsIgnoreCase(courseCode)).findFirst().map(ResponseEntity::ok).orElseThrow((
-                )->new ResourceNotFoundException("Course","CourseCode",courseCode));
+                .filter((Course c) -> c.getCourseCode().equalsIgnoreCase(courseCode)).findFirst().map(ResponseEntity::ok)
+                .orElseThrow(()->new ResourceNotFoundException("Course","CourseCode",courseCode));
     }
 
 //    query param for retrieving data with coursecode
     @GetMapping("/search/get-course")
     public ResponseEntity<Course> searchCourse(@RequestParam String courseCode){
-        return courses.stream().filter((Course c)->c.getCourseCode().equalsIgnoreCase(courseCode)).findFirst().map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build() );
+        if(courseCode.startsWith("U23")){
+            throw new IllegalArgumentException("Starts a numbers in it");
+        }
+        return courses.stream()
+                .filter((Course c)->c.getCourseCode().equalsIgnoreCase(courseCode)).findFirst().map(ResponseEntity::ok)
+                .orElseThrow(()->new ResourceNotFoundException("Course","CourseCode",courseCode));
     }
 //    retrieving the course details from the URL itself
     @GetMapping("/{course-code}/{sub-Name}/{credits}")
@@ -79,9 +84,10 @@ public class CourseController {
     }
 
     @PutMapping("/update-course/{code}")
-    public ResponseEntity<Course> updateCourse(@PathVariable String code, @RequestBody Course updatedCourse){
-        Course course=courses.stream().filter((Course c)->c.getCourseCode().equalsIgnoreCase(code))
-                .findFirst().orElse(null);
+    public ResponseEntity<Course> updateCourse(@PathVariable String courseCode, @RequestBody Course updatedCourse){
+        Course course=courses.stream()
+                .filter((Course c)->c.getCourseCode().equalsIgnoreCase(courseCode))
+                .findFirst().orElseThrow(()->new ResourceNotFoundException("Course","CourseCode",courseCode));
         course.setSubjectName(updatedCourse.getSubjectName());
         course.setCredits(updatedCourse.getCredits());
         return ResponseEntity.ok(course);
@@ -90,9 +96,20 @@ public class CourseController {
     @DeleteMapping("/delete-course/{course-code}")
     public ResponseEntity deleteCourse(@PathVariable("course-code") String courseCode){
         Course course=courses.stream().filter((Course c)->c.getCourseCode().equalsIgnoreCase(courseCode))
-                .findFirst().orElse(null);
+                .findFirst().orElseThrow(()->new ResourceNotFoundException("Course","CourseCode",courseCode));
         courses.remove(course);
         return ResponseEntity.accepted().body("Data removed or deleted successfully");
+    }
+
+    @PutMapping("/query/{coursecode}")
+    public String quueryCourse(@PathVariable String courseCode) throws Exception{
+        if(courseCode.startsWith("*")){
+            throw new IllegalArgumentException("it is having a special character");
+        }
+        else if(courseCode.startsWith("6")){
+            throw new Exception();
+        }
+        return courseCode;
     }
 
 }
