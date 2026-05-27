@@ -1,6 +1,7 @@
 package com.eduhub.eduhub_backend.controller;
 
 import com.eduhub.eduhub_backend.component.Course;
+import com.eduhub.eduhub_backend.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,8 @@ public class CourseController {
     public ResponseEntity<Course> getCourse(
             @PathVariable("code") String courseCode){
         return courses.stream()
-                .filter((Course c) -> c.getCourseCode().equalsIgnoreCase(courseCode)).findFirst().map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+                .filter((Course c) -> c.getCourseCode().equalsIgnoreCase(courseCode)).findFirst().map(ResponseEntity::ok).orElseThrow((
+                )->new ResourceNotFoundException("Course","CourseCode",courseCode));
     }
 
 //    query param for retrieving data with coursecode
@@ -85,8 +87,11 @@ public class CourseController {
         return ResponseEntity.ok(course);
     }
 
-    @DeleteMapping("/{course-code}/delete-course")
+    @DeleteMapping("/delete-course/{course-code}")
     public ResponseEntity deleteCourse(@PathVariable("course-code") String courseCode){
+        Course course=courses.stream().filter((Course c)->c.getCourseCode().equalsIgnoreCase(courseCode))
+                .findFirst().orElse(null);
+        courses.remove(course);
         return ResponseEntity.accepted().body("Data removed or deleted successfully");
     }
 
