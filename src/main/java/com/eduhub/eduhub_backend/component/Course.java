@@ -5,6 +5,9 @@ public class Course {
     private String subjectName;
     private int credits;
 
+    public Course(){
+
+    }
     public Course(String courseCode,String subjectName,int credits) {
         this.courseCode = courseCode;
         this.subjectName = subjectName;
